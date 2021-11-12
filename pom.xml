@@ -15,7 +15,7 @@
 	<name>Multi Datasource Sample</name>
 	<description>Sample project for Multi Datasource Implementation Structure</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>18</java.version>
 		<spring-cloud.version>2020.0.2</spring-cloud.version>
 	</properties>
 	<dependencies>
