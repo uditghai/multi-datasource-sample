@@ -1,0 +1,9 @@
+app:
+  name: Sample Microservice
+  api:
+    title: Sample Microservice APIs
+    version: 1.0.0
+    description: Sample Microservice APIs
+    base-package: com.sample.project.sample.controller
+    swagger:
+      enable: true
