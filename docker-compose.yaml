@@ -1,0 +1,23 @@
+version: '2'
+services:
+  mds:
+    build: .
+    image: mds:latest
+    container_name: mds
+    ports:
+    - "8080:8080"
+#    depends_on:
+#      - db
+    volumes:
+      - /Users/udigha/dev/logs:/var/log/dev
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/mds
+      - SPRING_DATASOURCE_USERNAME=postgres-user
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+#  db:
+#    image: 'postgres:9.6.24-bullseye'
+#    container_name: db
+#    environment:
+#      - POSTGRES_USER=postgres-user
+#      - POSTGRES_PASSWORD=postgres

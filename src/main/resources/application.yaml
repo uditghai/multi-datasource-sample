@@ -7,3 +7,14 @@ app:
     base-package: com.sample.project.sample.controller
     swagger:
       enable: true
+spring:
+  datasource:
+    url: jdbc:postgresql://host.docker.internal:5432/mds
+    username: postgres-user
+    password: postgres
+  output:
+    ansi:
+      enabled: detect
+logging:
+  file:
+    name: /var/log/dev/mds/app.log

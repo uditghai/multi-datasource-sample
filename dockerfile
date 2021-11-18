@@ -1,15 +1,15 @@
-FROM openjdk:18-slim-buster
-
-ARG MAVEN_VERSION=3.6.1
-#ARG USER_HOME_DIR="/usr/local"
+FROM openjdk:11-slim-buster
 WORKDIR /usr/local
-# Install maven
+
 RUN apt-get update
-RUN apt-get install -y maven
+RUN apt-get install -y curl maven
+ENV project=multi-datasource-sample
+ENV version=0.0.1
 RUN mkdir multi-datasource-sample
 WORKDIR multi-datasource-sample
 COPY ./ ./
-CMD ["mvn","spring-boot:run"]
+RUN ["mvn","clean","install"]
+ENTRYPOINT java -jar "target/$project-$version-SNAPSHOT.jar"
+HEALTHCHECK --interval=10s CMD curl http://localhost:8080/actuator/health
+
 EXPOSE 8080
-#RUN mwn package
-#ENTRYPOINT["java","-jar",""]

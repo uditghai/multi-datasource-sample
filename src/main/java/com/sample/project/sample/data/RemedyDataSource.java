@@ -1,51 +1,55 @@
 package com.sample.project.sample.data;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-
 import com.sample.project.sample.model.CustomerModel;
 import com.sample.project.sample.model.CustomerRequestModel;
+import com.sample.project.sample.utils.CustomerUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service("remedyDataSource")
 public class RemedyDataSource implements Datasource<CustomerRequestModel, CustomerModel> {
+    @Autowired
+    private CustomerRepository repository;
+    @Autowired
+    private CustomerUtil customerUtil;
+    String customerTypeFilter = "prospect";
 
-	private Map<String, CustomerModel> customers = new HashMap<String, CustomerModel>();
+    @Override
+    public CustomerModel create(CustomerRequestModel request) {
+        CustomerModel customerModel = new CustomerModel();
+        customerModel.setCustomerName(request.getCustomerName());
+        customerModel.setCustomerType(request.getCustomerType().toLowerCase(Locale.ROOT));
+        customerModel.setCustomerId(UUID.randomUUID().toString());
+        customerModel.setCreatedOn(LocalDate.now());
 
-	@Override
-	public CustomerModel create(CustomerRequestModel request) {
-		CustomerModel customerModel = new CustomerModel();
-		customerModel.setCustomerName(request.getCustomerName());
-		customerModel.setCustomerType(request.getCustomerType());
-		customerModel.setCustomerId(UUID.randomUUID().toString());
-		customerModel.setCreatedOn(LocalDate.now());
-		customers.put(customerModel.getCustomerId(), customerModel);
-		return customerModel;
-	}
+        repository.save(customerUtil.toCustomerEntity(customerModel));
+        return customerModel;
+    }
 
-	@Override
-	public CustomerModel read(String id) {
-		return customers.get(id);
-	}
+    @Override
+    public CustomerModel read(String id) {
+        return customerUtil.toCustomerModel(
+                repository.findById(id).orElseThrow());
+    }
 
-	@Override
-	public List<CustomerModel> read() {
-		return new ArrayList<CustomerModel>(customers.values());
-	}
+    @Override
+    public List<CustomerModel> read() {
+        return repository.findByCustomerType(customerTypeFilter).stream().map(customerUtil::toCustomerModel).collect(Collectors.toList());
+    }
 
-	@Override
-	public CustomerModel update(String id, CustomerRequestModel request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public CustomerModel update(String id, CustomerRequestModel request) {
+        return null;
+    }
 
-	@Override
-	public void delete(String id) {
-		customers.remove(id);
-	}
+    @Override
+    public void delete(String id) {
+        repository.deleteById(id);
+    }
 }

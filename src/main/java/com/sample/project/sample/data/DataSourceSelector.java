@@ -1,36 +1,43 @@
 package com.sample.project.sample.data;
 
+import com.sample.project.sample.model.DataSourceModel;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import com.sample.project.sample.model.DataSourceModel;
-
 public interface DataSourceSelector<E, F> {
 
-	List<DataSourceModel<?, ?>> dataSourceEntities = new ArrayList<DataSourceModel<?, ?>>();
+    org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DataSourceSelector.class);
 
-	default void addDatasource(Datasource<E, F> datasource) {
-		addDatasource(datasource, isTrue());
-	}
+    List<DataSourceModel<?, ?>> dataSourceEntities = new ArrayList<>();
 
-	default void addDatasource(Datasource<E, F> datasource, Predicate<E> predicate) {
-		dataSourceEntities.add(new DataSourceModel<E, F>(datasource, predicate));
-	}
+    default void addDatasource(Datasource<E, F> datasource) {
+        addDatasource(datasource, isTrue());
+    }
 
-	@SuppressWarnings("unchecked")
-	default List<Datasource<?, ?>> getDatasources(E data) {
-		return dataSourceEntities.parallelStream().filter(d -> ((Predicate<E>) d.getPredicate()).test(data))
-				.map(d -> d.getDatasource()).collect(Collectors.toList());
-	}
+    default void addDatasource(Datasource<E, F> datasource, Predicate<E> predicate) {
+        log.info("[addDatasource] New datasource added {} with condition {}", datasource, predicate);
+        dataSourceEntities.add(new DataSourceModel<>(datasource, predicate));
+    }
 
-	default List<Datasource<?, ?>> getDatasources() {
-		return dataSourceEntities.parallelStream().map(d -> d.getDatasource()).collect(Collectors.toList());
-	}
+    @SuppressWarnings("unchecked")
+    default List<Datasource<?, ?>> getDatasources(E data) {
+        List<Datasource<?, ?>> response = dataSourceEntities.parallelStream().filter(d -> ((Predicate<E>) d.getPredicate()).test(data))
+                .map(DataSourceModel::getDatasource).collect(Collectors.toList());
+        log.info("[getDatasources] {} for entity {}", response, data);
+        return response;
+    }
 
-	default Predicate<E> isTrue() {
-		return p -> true;
-	}
+    default List<Datasource<?, ?>> getDatasources() {
+        List<Datasource<?, ?>> response = dataSourceEntities.parallelStream().map(DataSourceModel::getDatasource).collect(Collectors.toList());
+        log.info("[getDatasources] {}", response);
+        return response;
+    }
+
+    default Predicate<E> isTrue() {
+        return p -> true;
+    }
 
 }

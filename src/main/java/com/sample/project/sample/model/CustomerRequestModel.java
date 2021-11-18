@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class CustomerRequestModel {
-	
-	private String customerName;
-	private String customerType;
+    private String customerName;
+
+    private String customerType;
 
 }
